@@ -50,4 +50,14 @@ sub test_constructor {
     'The object the constructor returns';
 }
 
+sub test_expect {
+  my ($test, $report) = @_;
 
+  my $mdb = Solaris::mdb->new();
+
+  isa_ok $mdb, $test->class_name,
+    'new mdb object';
+
+  isa_ok $mdb->expect, 'Expect',
+    'lazy builder for Expect object works as expected';
+}

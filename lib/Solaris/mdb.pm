@@ -7,13 +7,17 @@ use namespace::autoclean;
 use Log::Log4perl qw(:easy);
 use Expect;
 
-has 'expect',     is => 'ro', isa => 'Expect', lazy_build => 1;
+has [ 'expect' ]   =>   ( is => 'ro', isa => 'Expect', 
+                          builder => '_build_expect', lazy_build => 1, );
 
-#sub _build_expect {
-#  my $self = shift;
-#  my $exp  =  Expect->new;
-#  return $exp;
-#}
+sub _build_expect {
+  my $self = shift;
+  my $exp  =  Expect->new;
+  
+  $self->logger->debug( "Expect object built" );
+
+  return $exp;
+}
 
 #sub DEMOLISH {
 #  my $self = shift;
