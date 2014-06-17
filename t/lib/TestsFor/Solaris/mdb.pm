@@ -30,13 +30,13 @@ sub test_startup {
 
   # Exract live data tests if LIVE_TEST_DATA env variable exists and is set to a
   # 'truthy' value
-  if ( exists($ENV{'LIVE_TEST_DATA'}) and $ENV{'LIVE_TEST_DATA'} ) {
-    # TODO: Only proceed if we're running on Solaris 11 or later
-    diag "LIVE_TEST_DATA is set: testing with live data";
-  } else {
-    diag "Testing with canned data";
-    diag "If you want to test with live data, set envvar LIVE_TEST_DATA=1";
-  }
+  #if ( exists($ENV{'LIVE_TEST_DATA'}) and $ENV{'LIVE_TEST_DATA'} ) {
+  #  # TODO: Only proceed if we're running on Solaris 11 or later
+  #  diag "LIVE_TEST_DATA is set: testing with live data";
+  #} else {
+  #  diag "Testing with canned data";
+  #  diag "If you want to test with live data, set envvar LIVE_TEST_DATA=1";
+  #}
 }
 
 
@@ -51,11 +51,25 @@ sub test_constructor {
 sub test_expect {
   my ($test, $report) = @_;
 
-  my $mdb = Solaris::mdb->new();
-
-  isa_ok $mdb, $test->class_name,
-    'new mdb object';
+  my $mdb = new_ok("Solaris::mdb" => [ ],
+                   "Object constructed correctly");
 
   isa_ok $mdb->expect, 'Expect',
     'lazy builder for Expect object works as expected';
+
+  isnt($mdb->expect->pid, undef, 'There is an mdb PID');
+
+  can_ok($mdb, 'quit');
+
+#  TODO: {
+#    local $TODO = "Not done figuring out Try::Tiny exceptions";
+#
+#    my $bad_mdb = new_ok("Solaris::mdb" => [ "mdb_bin", "/usr/bin/junk_mdb" ], 
+#      "Create object with bad mdb_bin");
+#
+#    throws_ok { $bad_mdb->expect }  'UNKNOWN exception',
+#    'expect to die while trying to build Expect object';
+#
+#    undef $bad_mdb;
+#  }
 }
