@@ -44,10 +44,8 @@ sub test_startup {
 sub test_constructor {
   my ($test, $report) = @_;
 
-  my $mdb = Solaris::mdb->new();
-
-  isa_ok $mdb, $test->class_name,
-    'The object the constructor returns';
+  my $mdb = new_ok("Solaris::mdb" => [],
+                   "Object constructed correctly");
 }
 
 sub test_expect {
