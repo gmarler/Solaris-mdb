@@ -1,0 +1,9 @@
+- Engineering
+* Gather commonly used/needed pipelines
+* Handle ::etcsystem (Solaris::etc_system?)
+
+- User Stories
+* Start and exit mdb
+* Confirm/deny existence of a given kernel variable
+* Determine size of a given kernel variable
+* Print given kernel variable in various formats (dec and hex to begin with)
