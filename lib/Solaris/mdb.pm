@@ -117,7 +117,7 @@ sub kvar_exists {
                           exp_continue;
                         } ],
     # invalid kernel variable
-    [ "mdb: failed to dereference symbol: unknown symbol name/",
+    [ qr/mdb:\sfailed\sto\sdereference\ssymbol:\sunknown\ssymbol\sname/,
                     sub { my $self = shift;
                           $str = $self->match();
                           $log->debug("BEFORE: [" . $self->before() . "]");

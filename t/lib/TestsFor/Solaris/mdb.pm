@@ -88,6 +88,8 @@ sub test_quit {
 
   isnt($mdb->expect->pid, undef, 'There is an mdb PID');
 
+  can_ok($mdb, 'quit');
+
   ok($mdb->quit(), 'Ran quit() method');
 
   is($mdb->expect->pid, undef, 'mdb PID is now gone');
@@ -107,4 +109,10 @@ sub test_kvar_exists {
   cmp_ok($mdb->expect->pid, ">", 0, 'There is a valid mdb PID');
 
   can_ok($mdb,'kvar_exists');
+
+  # Pick a well known and *very* unlikely to be eliminated kernel variable
+  cmp_ok($mdb->kvar_exists('bufhwm'), "==", 1, "real kernel variable exists");
+
+  cmp_ok($mdb->kvar_exists('bogus_kvar'), "!=", 1,
+         "bogus kernel variable is not present");
 }
