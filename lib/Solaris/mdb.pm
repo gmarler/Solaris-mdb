@@ -26,8 +26,14 @@ sub _build_expect {
   $exp->raw_pty(1);
   # TODO: Make this an option to the constructor
   #$exp->debug(1);
-  $exp->spawn($self->mdb_bin, "-k") or
-    die("Cannot execute mdb_bin");
+  $exp->spawn($self->mdb_bin, "-k")
+    or die("Cannot spawn [" . $self->mdb_bin . "]: $!");
+
+  # TODO: See if process immediately exited with error message due to no having
+  # proper privileges:
+  #
+  # mdb: failed to open /dev/kmem: Permission denied
+  #
 
   $self->logger->debug( "Expect object built" );
 
@@ -87,6 +93,48 @@ sub quit {
   return 1;
 }
 
+=head1 kvar_exists
+
+Return true if specified kernel variable exists, false (0), otherwise
+
+=cut
+
+sub kvar_exists {
+  my $self = shift;
+  my $kvar = shift;
+  my $exp_obj = $self->expect;
+  my $log = $self->logger;
+  my ($str, $retval);
+
+  $log->debug("Checking whether kernel variable [$kvar] exists in this kernel");
+
+  $exp_obj->expect(5,
+    [ qr/\r?\>\s/,  sub { my $self = shift;
+                          $str = $self->match();
+                          $log->debug("BEFORE: [" . $self->before() . "]");
+                          $log->debug("MATCHED: [$str]");
+                          $self->send("${kvar}::nm -f sz -dh\n");
+                          exp_continue;
+                        } ],
+    # invalid kernel variable
+    [ "mdb: failed to dereference symbol: unknown symbol name/",
+                    sub { my $self = shift;
+                          $str = $self->match();
+                          $log->debug("BEFORE: [" . $self->before() . "]");
+                          $log->debug("MATCHED: [$str]");
+                          $self->send("${kvar}::nm -f sz -dh\n");
+                          $retval = 0; # FALSE/FAILED/DOESN'T EXIST
+                        } ],
+    # Valid kernel variable will return a valid numeric size > 0
+    [ qr/\r?\d+/,   sub { $retval = 1; } ],
+    [ 'eof',        sub { $log->debug("Encountered EOF");
+                        } ],
+    [ 'timeout',    sub { $log->die("TIMEOUT, match failed");
+                        } ],
+  );
+
+  return $retval;
+}
 
 no Moose;
 __PACKAGE__->meta->make_immutable;

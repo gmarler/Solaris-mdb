@@ -92,3 +92,19 @@ sub test_quit {
 
   is($mdb->expect->pid, undef, 'mdb PID is now gone');
 }
+
+sub test_kvar_exists {
+  my $test = shift;
+
+  my $mdb = new_ok("Solaris::mdb" => [ ],
+                   "Object constructed correctly");
+
+  isa_ok $mdb->expect, 'Expect',
+    'lazy builder for Expect object works as expected';
+
+  diag("This is the pid: " . $mdb->expect->pid);
+
+  cmp_ok($mdb->expect->pid, ">", 0, 'There is a valid mdb PID');
+
+  can_ok($mdb,'kvar_exists');
+}
