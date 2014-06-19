@@ -64,12 +64,31 @@ sub test_expect {
 #  TODO: {
 #    local $TODO = "Not done figuring out Try::Tiny exceptions";
 #
-#    my $bad_mdb = new_ok("Solaris::mdb" => [ "mdb_bin", "/usr/bin/junk_mdb" ], 
-#      "Create object with bad mdb_bin");
-#
-#    throws_ok { $bad_mdb->expect }  'UNKNOWN exception',
-#    'expect to die while trying to build Expect object';
-#
-#    undef $bad_mdb;
+   my $bad_mdb = new_ok("Solaris::mdb" => [ "mdb_bin", "/usr/bin/junk_mdb" ], 
+     "Create object with bad mdb_bin");
+
+   dies_ok { $bad_mdb->expect } 'expect to die while trying to build Expect object';
+
+   #throws_ok( sub { $bad_mdb->expect },
+   #           "Cannot execute mdb_bin",
+   #           'expect to die while trying to build Expect object' );
+
+    undef $bad_mdb;
 #  }
+}
+
+sub test_quit {
+  my $test = shift;
+
+  my $mdb = new_ok("Solaris::mdb" => [ ],
+                   "Object constructed correctly");
+
+  isa_ok $mdb->expect, 'Expect',
+    'lazy builder for Expect object works as expected';
+
+  isnt($mdb->expect->pid, undef, 'There is an mdb PID');
+
+  ok($mdb->quit(), 'Ran quit() method');
+
+  is($mdb->expect->pid, undef, 'mdb PID is now gone');
 }

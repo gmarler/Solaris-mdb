@@ -1,9 +1,11 @@
 - Engineering
+* In DEMOLISH
+  * Make sure mdb has been 'quit' before we do the soft close
 * Gather commonly used/needed pipelines
 * Handle ::etcsystem (Solaris::etc_system?)
 
 - User Stories
-* Start and exit mdb
+* Exit mdb
 * Confirm/deny existence of a given kernel variable
 * Determine size of a given kernel variable
 * Print given kernel variable in various formats (dec and hex to begin with)
