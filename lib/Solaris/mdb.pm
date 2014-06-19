@@ -122,10 +122,10 @@ sub kvar_exists {
                           $str = $self->match();
                           $log->debug("BEFORE: [" . $self->before() . "]");
                           $log->debug("MATCHED: [$str]");
-                          $self->send("${kvar}::nm -f sz -dh\n");
                           $retval = 0; # FALSE/FAILED/DOESN'T EXIST
                         } ],
     # Valid kernel variable will return a valid numeric size > 0
+    # TODO: Validate the captured match value
     [ qr/\r?\d+/,   sub { $retval = 1; } ],
     [ 'eof',        sub { $log->debug("Encountered EOF");
                         } ],
