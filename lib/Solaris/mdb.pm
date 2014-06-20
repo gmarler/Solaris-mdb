@@ -16,6 +16,7 @@ has [ 'mdb_bin' ]  =>   ( is => 'ro', isa => 'Str', default => '/usr/bin/mdb' );
 
 sub _build_expect {
   my $self = shift;
+  my $log = $self->logger;
 
   # mdb might not like your default TERM, so we set it to something we know it's
   # ok with here
@@ -29,8 +30,17 @@ sub _build_expect {
   $exp->spawn($self->mdb_bin, "-k")
     or die("Cannot spawn [" . $self->mdb_bin . "]: $!");
 
-  # TODO: See if process immediately exited with error message due to no having
+  # See if process immediately exited with error message due to no having
   # proper privileges:
+  $exp->expect(5,
+    [ qr{mdb:\sfailed\sto\sopen\s/dev/kmem:\sPermission\sdenied},
+                        sub {
+                          my $self = shift;
+                          my $str = $self->match();
+                          $log->logdie( "Insufficient Privileges" );
+                        } ],
+  );
+
   #
   # mdb: failed to open /dev/kmem: Permission denied
   #
