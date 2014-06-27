@@ -25,6 +25,7 @@ sub _build_expect {
   my $exp  =  Expect->new;
   # Needs a raw pseudo-tty
   $exp->raw_pty(1);
+  $exp->log_stdout(0);
   # TODO: Make this an option to the constructor
   #$exp->debug(1);
   $exp->spawn($self->mdb_bin, "-k")
