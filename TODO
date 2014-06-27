@@ -5,8 +5,8 @@
 * Handle ::system (Solaris::etc_system?)
 * Determine whether a kernel variable is global or inside a kernel module (which
   one?)
+* Handle ::interrupts dcmd output
 
 - User Stories
-* Confirm/deny existence of a given kernel variable
 * Determine size of a given kernel variable
 * Print given kernel variable in various formats (dec and hex to begin with)

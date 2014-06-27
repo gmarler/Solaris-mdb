@@ -147,6 +147,51 @@ sub kvar_exists {
   return $retval;
 }
 
+=head1 kvar_size
+
+Returns size (in bytes) of specified kernel variable.
+
+Returns undef if the variable doesn't exist.
+
+=cut
+
+sub kvar_size {
+  my $self = shift;
+  my $kvar = shift;
+  my $exp_obj = $self->expect;
+  my $log = $self->logger;
+  my ($str, $retval,  );
+
+  $log->debug("Checking size (in bytes) of kernel variable [$kvar]");
+
+  $exp_obj->expect(5,
+    [ qr/\r?\>\s/,  sub { my $self = shift;
+                          $str = $self->match();
+                          $log->debug("BEFORE: [" . $self->before() . "]");
+                          $log->debug("MATCHED: [$str]");
+                          $self->send("${kvar}::nm -f sz -dh\n");
+                          exp_continue;
+                        } ],
+    # invalid kernel variable
+    [ qr/mdb:\sfailed\sto\sdereference\ssymbol:\sunknown\ssymbol\sname/,
+                    sub { my $self = shift;
+                          $str = $self->match();
+                          $log->debug("BEFORE: [" . $self->before() . "]");
+                          $log->debug("MATCHED: [$str]");
+                          $retval = undef; # FALSE/FAILED/DOESN'T EXIST
+                        } ],
+    # Valid kernel variable will return a valid numeric size > 0
+    # TODO: Extract the actual value and verify it's a decimal number
+    [ qr/\r?\d+/,   sub { $retval = 1; } ],
+    [ 'eof',        sub { $log->debug("Encountered EOF");
+                        } ],
+    [ 'timeout',    sub { $log->die("TIMEOUT, match failed");
+                        } ],
+  );
+
+  return $retval;
+}
+
 no Moose;
 __PACKAGE__->meta->make_immutable;
 

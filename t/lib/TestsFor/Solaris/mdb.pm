@@ -126,4 +126,24 @@ sub test_kvar_exists {
          "bogus kernel variable is not present");
 }
 
+sub test_kvar_size {
+  my $test = shift;
+
+  my $mdb = $test->test_mdb;
+
+  can_ok($mdb, 'kvar_size');
+
+}
+
+sub test_shutdown {
+  my $test = shift;
+
+  # Do our teardown of the object here
+  my $mdb = $test->test_mdb;
+  undef $mdb;
+  
+  # And before exiting...
+  $test->next::method;
+}
+
 1;
