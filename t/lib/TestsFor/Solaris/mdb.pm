@@ -5,9 +5,11 @@ use Path::Class::File ();
 use Test::Class::Moose;
 with 'Test::Class::Moose::Role::AutoUse';
 
+# Test mdb object we'll be passing around
+has 'test_mdb' => ( is => 'rw', isa => 'Solaris::mdb' );
 
 sub test_startup {
-  my ($test, $report) = @_;
+  my ($test) = shift;
   $test->next::method;
 
   # Log::Log4perl Configuration in a string ...
@@ -37,22 +39,27 @@ sub test_startup {
   #  diag "Testing with canned data";
   #  diag "If you want to test with live data, set envvar LIVE_TEST_DATA=1";
   #}
+  $test->test_mdb( $test->class_name->new() );
 }
 
 
 
 sub test_constructor {
-  my ($test, $report) = @_;
+  my ($test) = shift;
 
-  my $mdb = new_ok("Solaris::mdb" => [],
-                   "Object constructed correctly");
+  ok my $mdb = $test->test_mdb, 'We should have a test object';
+
+  isa_ok($mdb, $test->class_name);
+#  my $mdb = new_ok("Solaris::mdb" => [],
+#                   "Object constructed correctly");
 }
 
 sub test_expect {
-  my ($test, $report) = @_;
+  my ($test) = @_;
 
-  my $mdb = new_ok("Solaris::mdb" => [ ],
-                   "Object constructed correctly");
+  my $mdb = $test->test_mdb;
+  #my $mdb = new_ok("Solaris::mdb" => [ ],
+  #                 "Object constructed correctly");
 
   isa_ok $mdb->expect, 'Expect',
     'lazy builder for Expect object works as expected';
@@ -80,8 +87,9 @@ sub test_expect {
 sub test_quit {
   my $test = shift;
 
-  my $mdb = new_ok("Solaris::mdb" => [ ],
-                   "Object constructed correctly");
+  my $mdb = $test->test_mdb;
+  #my $mdb = new_ok("Solaris::mdb" => [ ],
+  #                 "Object constructed correctly");
 
   isa_ok $mdb->expect, 'Expect',
     'lazy builder for Expect object works as expected';
@@ -98,8 +106,9 @@ sub test_quit {
 sub test_kvar_exists {
   my $test = shift;
 
-  my $mdb = new_ok("Solaris::mdb" => [ ],
-                   "Object constructed correctly");
+  my $mdb = $test->test_mdb;
+  #my $mdb = new_ok("Solaris::mdb" => [ ],
+  #                 "Object constructed correctly");
 
   isa_ok $mdb->expect, 'Expect',
     'lazy builder for Expect object works as expected';
@@ -116,3 +125,5 @@ sub test_kvar_exists {
   cmp_ok($mdb->kvar_exists('bogus_kvar'), "!=", 1,
          "bogus kernel variable is not present");
 }
+
+1;
