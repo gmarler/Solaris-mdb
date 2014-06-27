@@ -151,6 +151,8 @@ sub kvar_exists {
 
 Returns size (in bytes) of specified kernel variable.
 
+Returns 0 in case the output couldn't be extracted
+
 Returns undef if the variable doesn't exist.
 
 =cut
@@ -160,7 +162,7 @@ sub kvar_size {
   my $kvar = shift;
   my $exp_obj = $self->expect;
   my $log = $self->logger;
-  my ($str, $retval,  );
+  my ($str, $retval, $sz);
 
   $log->debug("Checking size (in bytes) of kernel variable [$kvar]");
 
@@ -182,7 +184,12 @@ sub kvar_size {
                         } ],
     # Valid kernel variable will return a valid numeric size > 0
     # TODO: Extract the actual value and verify it's a decimal number
-    [ qr/\r?\d+/,   sub { $retval = 1; } ],
+    [ qr/\r?\d+/,   sub { my $self = shift;
+                          $str  = $self->match();
+                          ($sz) = $str =~ m{(\d+)};
+                          if ($sz) { $retval = $sz; }
+                          else     { $retval =   0; }
+                        } ],
     [ 'eof',        sub { $log->debug("Encountered EOF");
                         } ],
     [ 'timeout',    sub { $log->die("TIMEOUT, match failed");

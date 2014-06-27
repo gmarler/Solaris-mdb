@@ -133,6 +133,9 @@ sub test_kvar_size {
 
   can_ok($mdb, 'kvar_size');
 
+  cmp_ok($mdb->kvar_size('bufhwm'),  "==",  4,  'bufhwm size in bytes is correct');
+  is($mdb->kvar_size('bogus_kvar'), undef, 'bogus kernel var size in bytes is correct');
+  # TODO: Test return case of 0
 }
 
 sub test_shutdown {
