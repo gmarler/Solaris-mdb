@@ -1,0 +1,22 @@
+Stories:
+
+- Only run tests on Solaris
+
+- Only install on Solaris
+
+- Determine if module is loaded or not
+  ::dmod <modname>; loaded and not loaded
+
+- Determine if variable is defined or not
+  Solaris::mdb::Variable (attribute?)
+
+- Determine size (in bytes) of an existing variable
+  Solaris::mdb::Variable attribute, initialized at construction time
+
+- Allow setting preferred output format for a variable
+  Solaris::mdb::Variable attribute
+
+- Print variable in variety of formats (dec, hex, oct, binary),
+
+- Run a command, dcmd, walker, pipeline, and pass a code reference to work
+  with the output
