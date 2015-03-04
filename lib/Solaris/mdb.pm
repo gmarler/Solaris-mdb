@@ -7,6 +7,9 @@ package Solaris::mdb;
 # ABSTRACT: Provides a Perl interface to the Solaris mdb utility
 #
 use namespace::autoclean;
+use Expect;
 use Moose;
+
+
 
 1;
