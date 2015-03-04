@@ -7,7 +7,7 @@ with 'Test::Class::Moose::Role::AutoUse';
 sub test_startup {
   my $test = shift;
 
-  unless ($^O eq 'Win32') {
+  unless ($^O eq 'solaris') {
     $test->test_skip("Tests won't run on $^O");
   }
 }
@@ -15,7 +15,7 @@ sub test_startup {
 sub test_load {
   my $test = shift;
 
-  diag "test load";
+  use_ok($test->test_class);
 }
 
 1;
