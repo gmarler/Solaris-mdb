@@ -11,11 +11,11 @@ use Expect;
 use Moose;
 
 # Expect instance that's a connection to an mdb session
-has mdb => ( isa          => Expect,
-             is           => ro,
-             lazy_builder => 1,
-             predicate    => 'has_mdb',
-             clearer      => 'clear_mdb',
+has mdb => ( isa        => 'Expect',
+             is         => 'ro',
+             lazy_build => 1,
+             predicate  => 'has_mdb',
+             clearer    => 'clear_mdb',
            );
 
 sub _build_mdb {
