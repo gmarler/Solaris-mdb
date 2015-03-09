@@ -27,6 +27,15 @@ sub _build_mdb {
   return $e;
 }
 
+sub DEMOLISH {
+  my ($self) = shift;
+
+  # Refactor
+  my $e = $self->mdb;
+  $e->send('$q' . "\n");
+  $e->soft_close();
+  $e->hard_close();
+}
 sub variable_exists {
 
 }
