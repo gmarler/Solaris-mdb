@@ -106,8 +106,22 @@ sub DEMOLISH {
 
 sub variable_exists {
   my ($self) = shift;
+  my ($varname) = shift;
+
+  # TODO: Throw an exception is $varname is not defined
 
   # Expect the mdb prompt
+  my $e = $mdb->mdb();
+  $e->expect( 2,
+              [ qr//s,
+                sub { my $sub_e = shift;
+                    }
+              ],
+              [ eof =>
+                sub { my $sub_e = shift;
+                    }
+              ],
+  );
   # Test for the variable's existence
   #
   # EXISTS: 
