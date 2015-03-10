@@ -1,13 +1,11 @@
 Stories:
 
-- Only run tests on Solaris
-
 - Only install on Solaris
 
 - Determine if module is loaded or not
   ::dmod <modname>; loaded and not loaded
 
-- Determine if variable is defined or not
+* Determine if variable is defined or not
   Solaris::mdb::Variable (attribute?)
 
 - Determine size (in bytes) of an existing variable
