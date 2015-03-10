@@ -1,3 +1,4 @@
+use v5.18.1;
 use strict;
 use warnings;
 
@@ -25,6 +26,22 @@ sub _build_mdb {
   $e->raw_pty(1);
   $e->log_stdout(0);
   $e->spawn('mdb', '-k') or die "cannot spawn mdb -k: $!\n";
+
+  # Even if we don't have the necessary privilege,
+  # which is file_dac_read on /devices/pseudo/mm@0:kmem
+  # Expect will still be successful.  So we need to 'expect()' on the following
+  # output in such cases:
+
+  #  mdb: cannot open /dev/kmem
+  #  mdb: failed to initialize target: Permission denied
+  #$e->expect( 2,
+  #           # [ qr/^mdb:\s+failed\s+[^\n]+Permission\sdenied/s,
+  #           [ qr/Permission\s+denied/s,
+  #             sub { die "No permission to invoke mdb -k: " . $e->before(); return; }
+  #           ],
+  #           #[ eof => sub { die "crapped out"; } ],
+  #          );
+
   return $e;
 }
 
@@ -68,9 +85,23 @@ sub DEMOLISH {
 
   # Refactor
   my $e = $self->mdb;
-  $e->send('$q' . "\n");
-  $e->soft_close();
-  $e->hard_close();
+  # say "In DEMOLISH";
+  my $pid = $e->pid();
+  if (defined($pid)) {
+    # say "mdb PID: " . $pid; 
+    # say "sending mdb quit";
+    $e->send('$q' . "\n");
+    $e->expect(undef);
+    # say $e->before();
+    my $status = $e->exitstatus();
+    # if ($status == 0) {
+    #   say "mdb exited cleanly";
+    # } else {
+    #   say "mdb exited BADLY: $status";
+    # }
+  } else {
+    # say "mdb already dead";
+  }
 }
 
 sub variable_exists {
