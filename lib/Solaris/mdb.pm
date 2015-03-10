@@ -111,14 +111,17 @@ sub variable_exists {
   # TODO: Throw an exception is $varname is not defined
 
   # Expect the mdb prompt
-  my $e = $mdb->mdb();
+  my $e = $self->mdb();
   $e->expect( 2,
-              [ qr//s,
+              [ qr/^>\s(?!\s+)/m,
                 sub { my $sub_e = shift;
+                      $sub_e->send("${varname}::nm -h -f sz\n");
                     }
               ],
               [ eof =>
                 sub { my $sub_e = shift;
+                      # TODO: Throw an exception
+                      die "mdb terminated unexpectedly";
                     }
               ],
   );
@@ -132,8 +135,27 @@ sub variable_exists {
   # DOES NOT EXIST:
   # > junk::nm -h -f sz
   # mdb: failed to dereference symbol: unknown symbol name
+  my ($exists);
+  $e->expect( 2,
+              [ qr/^0x0+\d+\n/m,
+                sub { my $sub_e = shift;
+                      $exists = 1;
+                    }
+              ],
+              [ qr/unknown\s+symbol\s+name/m,
+                sub { my $sub_e = shift;
+                      $exists = 0;
+                    }
+              ],
+              [ eof =>
+                sub { my $sub_e = shift;
+                      # TODO: Throw an exception
+                      die "mdb terminated unexpectedly";
+                    }
+              ],
+  );
 
-  return;
+  return $exists;
 }
 
 1;

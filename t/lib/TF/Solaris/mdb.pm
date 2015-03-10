@@ -78,9 +78,11 @@ sub test_variable_exists {
 
   my $mdb = Solaris::mdb->new();
 
-  ok($mdb->variable_exists("ncsize"), 'ncsize should exist as a kernel variable');
+  cmp_ok($mdb->variable_exists("ncsize"), '==', 1,
+         'ncsize should exist as a kernel variable');
 
-  ok(defined $mdb->variable_exists("junk"), 'junk is a bogus kernel variable');
+  cmp_ok($mdb->variable_exists("junk"), '==', 0,
+         'junk is a bogus kernel variable');
 }
 
 1;
