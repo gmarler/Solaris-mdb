@@ -105,7 +105,21 @@ sub DEMOLISH {
 }
 
 sub variable_exists {
+  my ($self) = shift;
 
+  # Expect the mdb prompt
+  # Test for the variable's existence
+  #
+  # EXISTS: 
+  # > ncsize::nm -h -f sz
+  # 0x0000000000000004
+  #
+  #
+  # DOES NOT EXIST:
+  # > junk::nm -h -f sz
+  # mdb: failed to dereference symbol: unknown symbol name
+
+  return;
 }
 
 1;

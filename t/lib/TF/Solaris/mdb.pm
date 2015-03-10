@@ -73,4 +73,14 @@ sub test_expect_mdb_exits_ok {
   #cmp_ok($e->exitstatus(), '==', 1, 'hard close exit status 1');
 }
 
+sub test_variable_exists {
+  my $test = shift;
+
+  my $mdb = Solaris::mdb->new();
+
+  ok($mdb->variable_exists("ncsize"), 'ncsize should exist as a kernel variable');
+
+  ok(defined $mdb->variable_exists("junk"), 'junk is a bogus kernel variable');
+}
+
 1;
