@@ -23,9 +23,45 @@ sub _build_mdb {
 
   my $e = Expect->new();
   $e->raw_pty(1);
+  $e->log_stdout(0);
   $e->spawn('mdb', '-k') or die "cannot spawn mdb -k: $!\n";
   return $e;
 }
+
+# $e->expect(2,
+#   [ qr/^>\s(?!\s+)/m => sub { my $e = shift;
+#                              say "PROMPT matched";
+#                              #say "BEFORE:  " . $e->before();
+#                              #say "MATCHED: " . $e->match();
+#                              #say "AFTER:   " . $e->after();
+#                              if ($done_with_mdb and not $quit_sent) {
+#                                $e->send('$q' . "\n");
+#                                $quit_sent++;
+#                              } else {
+#                                $done_with_mdb++;
+#                                $e->send("::dcmds\n");
+#                                exp_continue;
+#                              }
+#                            }
+#   ],
+# #  [ qr/^::(?:[^\r]+)\r/m  => sub { my $e = shift;
+# #                             #say "BEFORE:  " . $e->before();
+# #                             #say "MATCHED: " . $e->match();
+# #                             #say "AFTER:   " . $e->after();
+# #                             exp_continue;
+# #                           }
+# #  ],
+#   [ qr/^>>\s+More\s+\[[^\?]+\?\s/m  => sub { my $e = shift;
+#                              say "MULTILINE OUTPUT matched";
+#                              #say "BEFORE:  " . $e->before();
+#                              #say "MATCHED: " . $e->match();
+#                              #say "AFTER:   " . $e->after();
+#                              $e->send("c\r");
+#                              exp_continue;
+#                            }
+#   ],
+# );
+
 
 sub DEMOLISH {
   my ($self) = shift;
@@ -36,6 +72,7 @@ sub DEMOLISH {
   $e->soft_close();
   $e->hard_close();
 }
+
 sub variable_exists {
 
 }
