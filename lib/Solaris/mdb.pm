@@ -108,7 +108,10 @@ sub variable_exists {
   my ($self) = shift;
   my ($varname) = shift;
 
-  # TODO: Throw an exception is $varname is not defined
+  # Throw an exception is $varname is not defined
+  unless (defined($varname)) {
+    die "variable_exists requires a variable";
+  }
 
   # Expect the mdb prompt
   my $e = $self->mdb();

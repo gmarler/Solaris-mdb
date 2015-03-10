@@ -67,7 +67,7 @@ sub test_expect_mdb_exits_ok {
   # Wait for one second, for any output whatsoever
   $e->expect(1);
   # Now check to see if mdb has emitted its famous init message
-  like($e->before(), qr/Loading\s+modules:/sm, 'Loading modules message');
+  like($e->before(), qr/Loading\s+modules:/m, 'Loading modules message');
 
   #$e->hard_close();
   #cmp_ok($e->exitstatus(), '==', 1, 'hard close exit status 1');
@@ -77,6 +77,9 @@ sub test_variable_exists {
   my $test = shift;
 
   my $mdb = Solaris::mdb->new();
+
+  throws_ok { $mdb->variable_exists() } qr/requires\sa\svariable/,
+    'Exception for not specifying variable';
 
   cmp_ok($mdb->variable_exists("ncsize"), '==', 1,
          'ncsize should exist as a kernel variable');
