@@ -68,20 +68,20 @@ sub test_expect {
 
   can_ok($mdb, 'quit');
 
-#  TODO: {
-#    local $TODO = "Not done figuring out Try::Tiny exceptions";
+  TODO: {
+    local $TODO = "Not done figuring out Try::Tiny exceptions";
 #
    my $bad_mdb = new_ok("Solaris::mdb" => [ "mdb_bin", "/usr/bin/junk_mdb" ], 
      "Create object with bad mdb_bin");
 
-   dies_ok { $bad_mdb->expect } 'expect to die while trying to build Expect object';
+   #dies_ok { $bad_mdb->expect } 'expect to die while trying to build Expect object';
 
    #throws_ok( sub { $bad_mdb->expect },
    #           "Cannot execute mdb_bin",
    #           'expect to die while trying to build Expect object' );
 
     undef $bad_mdb;
-#  }
+  }
 }
 
 sub test_quit {
@@ -124,6 +124,28 @@ sub test_kvar_exists {
 
   cmp_ok($mdb->kvar_exists('bogus_kvar'), "!=", 1,
          "bogus kernel variable is not present");
+}
+
+sub test_dcmd_memstat {
+  my $test = shift;
+
+  my $mdb = $test->test_mdb;
+  #my $mdb = new_ok("Solaris::mdb" => [ ],
+  #                 "Object constructed correctly");
+
+  isa_ok $mdb->expect, 'Expect',
+    'lazy builder for Expect object works as expected';
+
+  diag("This is the pid: " . $mdb->expect->pid);
+
+  cmp_ok($mdb->expect->pid, ">", 0, 'There is a valid mdb PID');
+
+  can_ok($mdb,'capture_dcmd');
+
+  like($mdb->capture_dcmd('::memstat'), qr/Kernel/, "::memstat produces output");
+
+#  cmp_ok($mdb->kvar_exists('bogus_kvar'), "!=", 1,
+#         "bogus kernel variable is not present");
 }
 
 sub test_kvar_size {

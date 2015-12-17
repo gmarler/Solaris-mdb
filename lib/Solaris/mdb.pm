@@ -28,8 +28,8 @@ sub _build_expect {
   $exp->log_stdout(0);
   # TODO: Make this an option to the constructor
   #$exp->debug(1);
-  $exp->spawn($self->mdb_bin, "-k")
-    or die("Cannot spawn [" . $self->mdb_bin . "]: $!");
+  $exp->spawn("/usr/bin/pfexec", $self->mdb_bin, "-k")
+    or die("Cannot spawn [/usr/bin/pfexec " . $self->mdb_bin . "]: $!");
 
   # See if process immediately exited with error message due to no having
   # proper privileges:
@@ -85,7 +85,7 @@ sub quit {
                         } ],
     [ 'eof',        sub { $log->debug("Encountered EOF");
                         } ],
-    [ 'timeout',    sub { $log->die("TIMEOUT, match failed");
+    [ 'timeout',    sub { $log->logdie("TIMEOUT, match failed");
                         } ],
   );
 
@@ -98,10 +98,66 @@ sub quit {
     $exit_status >>= 8;
     $log->debug("Exited with status $exit_status");
   } else {
-    $log->die("Could not extract exit status");
+    $log->logdie("Could not extract exit status");
   }
 
   return 1;
+}
+
+sub capture_dcmd {
+  my $self    = shift;
+  my $dcmd    = shift;
+  my $log     = $self->logger;
+  my $exp_obj = $self->expect;
+  my ($str,$retval,$output);
+
+  if ($dcmd !~ /^::/) {
+    $log->error("[$dcmd] isn't a valid mdb dcmd!");
+    return;    # undef
+  }
+  $log->debug("Running dcmd [$dcmd]");
+
+  $exp_obj->expect(5,
+    #
+    # Valid dcmd will return possibly multiline output, followed by a prompt
+    # 
+    [ qr/Total[^\n]+\n/,
+                    sub { my $self = shift;
+                          $log->debug("BEFORE: [" . $self->before() . "]");
+                          $log->debug("MATCHED: [" . $self->match() . "]");
+                          $log->debug("AFTER: [" . $self->after() . "]");
+                          $str  = $self->before() . $self->match();
+                          # Strip the dcmd + newline off the beginning of the
+                          # output
+                          ($output = $str) =~ s/^${dcmd}\n//smx;
+                          $log->debug("USEFUL OUTPUT: [$output]");
+                          if ($output) { $retval = $output; }
+                          else         { $retval =   undef; }
+                        } ],
+    [ qr/\r?\>\s/,  sub { my $self = shift;
+                          $str = $self->match();
+                          $log->debug("BEFORE: [" . $self->before() . "]");
+                          $log->debug("MATCHED: [$str]");
+                          $self->send("${dcmd}\n");
+                          exp_continue;
+                        } ],
+    # invalid dcmd
+    [ qr/mdb:\sinvalid\scommand\s'${dcmd}':\sunknown\sdcmd\sname/,
+                    sub { my $self = shift;
+                          $str = $self->match();
+                          $log->debug("BEFORE: [" . $self->before() . "]");
+                          $log->debug("MATCHED: [$str]");
+                          $retval = undef; # FALSE/FAILED/DOESN'T EXIST
+                        } ],
+    [ 'eof',        sub { $log->debug("Encountered EOF");
+                        } ],
+    [ 'timeout',    sub { $log->logdie("TIMEOUT, match failed");
+                        } ],
+  );
+
+  $log->debug("LEAVING capture_dcmd");
+
+  return $retval;
 }
 
 =head1 kvar_exists
@@ -140,7 +196,7 @@ sub kvar_exists {
     [ qr/\r?\d+/,   sub { $retval = 1; } ],
     [ 'eof',        sub { $log->debug("Encountered EOF");
                         } ],
-    [ 'timeout',    sub { $log->die("TIMEOUT, match failed");
+    [ 'timeout',    sub { $log->logdie("TIMEOUT, match failed");
                         } ],
   );
 
@@ -192,7 +248,7 @@ sub kvar_size {
                         } ],
     [ 'eof',        sub { $log->debug("Encountered EOF");
                         } ],
-    [ 'timeout',    sub { $log->die("TIMEOUT, match failed");
+    [ 'timeout',    sub { $log->logdie("TIMEOUT, match failed");
                         } ],
   );
 
