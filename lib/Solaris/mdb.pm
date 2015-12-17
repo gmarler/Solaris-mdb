@@ -65,6 +65,13 @@ sub _build_expect {
   return $exp;
 }
 
+=method DEMOLISH
+
+Standard Moose destructor, needed to cleanly close the Expect object's
+connection to the mdb command.
+
+=cut
+
 sub DEMOLISH {
   my $self = shift;
 
