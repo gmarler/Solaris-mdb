@@ -1,5 +1,8 @@
 package Solaris::mdb;
 
+use strict;
+use warnings;
+
 # VERSION
 # ABSTRACT: Perl Interface to Solaris mdb command
 #
