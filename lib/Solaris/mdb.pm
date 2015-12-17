@@ -1,5 +1,8 @@
 package Solaris::mdb;
 
+# VERSION
+# ABSTRACT: Perl Interface to Solaris mdb command
+#
 use Moose;
 use Moose::Util::TypeConstraints;
 with 'MooseX::Log::Log4perl';
@@ -10,7 +13,7 @@ use Expect        qw(exp_continue);
 #use Throwable::Factory
 #  GeneralException => undef;
 
-has [ 'expect' ]   =>   ( is => 'ro', isa => 'Expect', 
+has [ 'expect' ]   =>   ( is => 'ro', isa => 'Expect',
                           builder => '_build_expect', lazy_build => 1, );
 has [ 'mdb_bin' ]  =>   ( is => 'ro', isa => 'Str', default => '/usr/bin/mdb' );
 
@@ -104,6 +107,12 @@ sub quit {
   return 1;
 }
 
+=head1 capture_dcmd
+
+Return the output of a given mdb dcmd
+
+=cut
+
 sub capture_dcmd {
   my $self    = shift;
   my $dcmd    = shift;
@@ -120,7 +129,7 @@ sub capture_dcmd {
   $exp_obj->expect(5,
     #
     # Valid dcmd will return possibly multiline output, followed by a prompt
-    # 
+    #
     [ qr/Total[^\n]+\n/,
                     sub { my $self = shift;
                           $log->debug("BEFORE: [" . $self->before() . "]");
