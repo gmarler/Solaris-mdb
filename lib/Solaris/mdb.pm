@@ -155,8 +155,6 @@ sub capture_dcmd {
                         } ],
   );
 
-  $log->debug("LEAVING capture_dcmd");
-
   return $retval;
 }
 
@@ -176,13 +174,6 @@ sub kvar_exists {
   $log->debug("Checking whether kernel variable [$kvar] exists in this kernel");
 
   $exp_obj->expect(5,
-    [ qr/\r?\>\s/,  sub { my $self = shift;
-                          $str = $self->match();
-                          $log->debug("BEFORE: [" . $self->before() . "]");
-                          $log->debug("MATCHED: [$str]");
-                          $self->send("${kvar}::nm -f sz -dh\n");
-                          exp_continue;
-                        } ],
     # invalid kernel variable
     [ qr/mdb:\sfailed\sto\sdereference\ssymbol:\sunknown\ssymbol\sname/,
                     sub { my $self = shift;
@@ -194,6 +185,13 @@ sub kvar_exists {
     # Valid kernel variable will return a valid numeric size > 0
     # TODO: Validate the captured match value
     [ qr/\r?\d+/,   sub { $retval = 1; } ],
+    [ qr/\r?\>\s/,  sub { my $self = shift;
+                          $str = $self->match();
+                          $log->debug("BEFORE: [" . $self->before() . "]");
+                          $log->debug("MATCHED: [$str]");
+                          $self->send("${kvar}::nm -f sz -dh\n");
+                          exp_continue;
+                        } ],
     [ 'eof',        sub { $log->debug("Encountered EOF");
                         } ],
     [ 'timeout',    sub { $log->logdie("TIMEOUT, match failed");
@@ -223,13 +221,6 @@ sub kvar_size {
   $log->debug("Checking size (in bytes) of kernel variable [$kvar]");
 
   $exp_obj->expect(5,
-    [ qr/\r?\>\s/,  sub { my $self = shift;
-                          $str = $self->match();
-                          $log->debug("BEFORE: [" . $self->before() . "]");
-                          $log->debug("MATCHED: [$str]");
-                          $self->send("${kvar}::nm -f sz -dh\n");
-                          exp_continue;
-                        } ],
     # invalid kernel variable
     [ qr/mdb:\sfailed\sto\sdereference\ssymbol:\sunknown\ssymbol\sname/,
                     sub { my $self = shift;
@@ -245,6 +236,13 @@ sub kvar_size {
                           ($sz) = $str =~ m{(\d+)};
                           if ($sz) { $retval = $sz; }
                           else     { $retval =   0; }
+                        } ],
+    [ qr/\r?\>\s/,  sub { my $self = shift;
+                          $str = $self->match();
+                          $log->debug("BEFORE: [" . $self->before() . "]");
+                          $log->debug("MATCHED: [$str]");
+                          $self->send("${kvar}::nm -f sz -dh\n");
+                          exp_continue;
                         } ],
     [ 'eof',        sub { $log->debug("Encountered EOF");
                         } ],
