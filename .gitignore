@@ -5,4 +5,7 @@
 _build
 # Avoid archives of this distribution
 /Solaris-mdb*
+# Files to ignore
+META.json
+README.pod
 
