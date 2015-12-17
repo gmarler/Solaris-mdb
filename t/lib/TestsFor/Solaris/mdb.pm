@@ -16,12 +16,12 @@ sub test_startup {
   my $conf = q(
     #log4perl.rootLogger          = DEBUG, Logfile, Screen
     log4perl.rootLogger          = INFO, Screen
-  
+
     #log4perl.appender.Logfile          = Log::Log4perl::Appender::File
     #log4perl.appender.Logfile.filename = test.log
     #log4perl.appender.Logfile.layout   = Log::Log4perl::Layout::PatternLayout
     #log4perl.appender.Logfile.layout.ConversionPattern = [%r] %F %L %m%n
-  
+
     log4perl.appender.Screen         = Log::Log4perl::Appender::Screen
     log4perl.appender.Screen.stderr  = 0
     log4perl.appender.Screen.layout = Log::Log4perl::Layout::SimpleLayout
@@ -71,7 +71,7 @@ sub test_expect {
   TODO: {
     local $TODO = "Not done figuring out Try::Tiny exceptions";
 #
-   my $bad_mdb = new_ok("Solaris::mdb" => [ "mdb_bin", "/usr/bin/junk_mdb" ], 
+   my $bad_mdb = new_ok("Solaris::mdb" => [ "mdb_bin", "/usr/bin/junk_mdb" ],
      "Create object with bad mdb_bin");
 
    #dies_ok { $bad_mdb->expect } 'expect to die while trying to build Expect object';
@@ -185,7 +185,7 @@ sub test_shutdown {
   # Do our teardown of the object here
   my $mdb = $test->test_mdb;
   undef $mdb;
-  
+
   # And before exiting...
   $test->next::method;
 }
