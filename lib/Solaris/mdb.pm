@@ -6,6 +6,14 @@ use warnings;
 # VERSION
 # ABSTRACT: Perl Interface to Solaris mdb command
 #
+#
+
+=head1 NAME
+
+Solaris::mdb - A Perl Interface to the Solaris mdb command
+
+=cut
+
 use Moose;
 use Moose::Util::TypeConstraints;
 with 'MooseX::Log::Log4perl';
@@ -66,7 +74,7 @@ sub DEMOLISH {
   }
 }
 
-=head1 quit
+=method quit
 
 Quit/Exit the mdb process this object is connected to
 
@@ -110,7 +118,7 @@ sub quit {
   return 1;
 }
 
-=head1 capture_dcmd
+=method capture_dcmd
 
 Return the output of a given mdb dcmd
 
@@ -171,7 +179,7 @@ sub capture_dcmd {
   return $retval;
 }
 
-=head1 kvar_exists
+=method kvar_exists
 
 Return true if specified kernel variable exists, false (0), otherwise
 
@@ -214,7 +222,7 @@ sub kvar_exists {
   return $retval;
 }
 
-=head1 kvar_size
+=method kvar_size
 
 Returns size (in bytes) of specified kernel variable.
 
