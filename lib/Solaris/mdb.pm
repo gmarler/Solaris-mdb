@@ -134,20 +134,21 @@ sub capture_dcmd {
                           if ($output) { $retval = $output; }
                           else         { $retval =   undef; }
                         } ],
-    [ qr/\r?\>\s/,  sub { my $self = shift;
-                          $str = $self->match();
-                          $log->debug("BEFORE: [" . $self->before() . "]");
-                          $log->debug("MATCHED: [$str]");
-                          $self->send("${dcmd}\n");
-                          exp_continue;
-                        } ],
     # invalid dcmd
     [ qr/mdb:\sinvalid\scommand\s'${dcmd}':\sunknown\sdcmd\sname/,
                     sub { my $self = shift;
                           $str = $self->match();
                           $log->debug("BEFORE: [" . $self->before() . "]");
                           $log->debug("MATCHED: [$str]");
+                          $log->warn("${dcmd} appears to be a non-existent dcmd");
                           $retval = undef; # FALSE/FAILED/DOESN'T EXIST
+                        } ],
+    [ qr/\r?\>\s/,  sub { my $self = shift;
+                          $str = $self->match();
+                          $log->debug("BEFORE: [" . $self->before() . "]");
+                          $log->debug("MATCHED: [$str]");
+                          $self->send("${dcmd}\n");
+                          exp_continue;
                         } ],
     [ 'eof',        sub { $log->debug("Encountered EOF");
                         } ],

@@ -15,7 +15,7 @@ sub test_startup {
   # Log::Log4perl Configuration in a string ...
   my $conf = q(
     #log4perl.rootLogger          = DEBUG, Logfile, Screen
-    log4perl.rootLogger          = DEBUG, Screen
+    log4perl.rootLogger          = INFO, Screen
   
     #log4perl.appender.Logfile          = Log::Log4perl::Appender::File
     #log4perl.appender.Logfile.filename = test.log
@@ -130,8 +130,6 @@ sub test_dcmd_memstat {
   my $test = shift;
 
   my $mdb = $test->test_mdb;
-  #my $mdb = new_ok("Solaris::mdb" => [ ],
-  #                 "Object constructed correctly");
 
   isa_ok $mdb->expect, 'Expect',
     'lazy builder for Expect object works as expected';
@@ -147,6 +145,27 @@ sub test_dcmd_memstat {
 #  cmp_ok($mdb->kvar_exists('bogus_kvar'), "!=", 1,
 #         "bogus kernel variable is not present");
 }
+
+sub test_dcmd_bogus {
+  my $test = shift;
+
+  my $mdb = $test->test_mdb;
+
+  isa_ok $mdb->expect, 'Expect',
+    'lazy builder for Expect object works as expected';
+
+  diag("This is the pid: " . $mdb->expect->pid);
+
+  cmp_ok($mdb->expect->pid, ">", 0, 'There is a valid mdb PID');
+
+  can_ok($mdb,'capture_dcmd');
+
+  is($mdb->capture_dcmd('::bogus_dcmd'), undef, "::bogus_dcmd fails");
+
+#  cmp_ok($mdb->kvar_exists('bogus_kvar'), "!=", 1,
+#         "bogus kernel variable is not present");
+}
+
 
 sub test_kvar_size {
   my $test = shift;
