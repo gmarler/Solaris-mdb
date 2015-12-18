@@ -15,7 +15,7 @@ sub test_startup {
   # Log::Log4perl Configuration in a string ...
   my $conf = q(
     #log4perl.rootLogger          = DEBUG, Logfile, Screen
-    log4perl.rootLogger          = INFO, Screen
+    log4perl.rootLogger          = DEBUG, Screen
 
     #log4perl.appender.Logfile          = Log::Log4perl::Appender::File
     #log4perl.appender.Logfile.filename = test.log
@@ -141,10 +141,32 @@ sub test_dcmd_memstat {
   can_ok($mdb,'capture_dcmd');
 
   like($mdb->capture_dcmd('::memstat'), qr/Kernel/, "::memstat produces output");
-
-#  cmp_ok($mdb->kvar_exists('bogus_kvar'), "!=", 1,
-#         "bogus kernel variable is not present");
 }
+
+sub test_dcmd_memstat_w_time {
+  my $test = shift;
+  my $captured_text;
+
+  my $mdb = $test->test_mdb;
+
+  isa_ok $mdb->expect, 'Expect',
+    'Expect object still exists';
+
+  diag("This is the pid: " . $mdb->expect->pid);
+
+  cmp_ok($mdb->expect->pid, ">", 0, 'There is a valid mdb PID');
+
+  can_ok($mdb,'capture_dcmd');
+
+  $captured_text = 
+    $mdb->capture_dcmd("time::print -d ! sed -e 's/^0t//' ; ::memstat");
+  ok( defined( $captured_text ), 'actually captured SOMETHING from dcmd' ); 
+  like($captured_text,
+       qr/^\d+\n/, "::memstat with time is prefixed with time");
+  like($captured_text,
+       qr/Kernel/, "::memstat with time produces :memstat like output");
+}
+
 
 sub test_dcmd_bogus {
   my $test = shift;

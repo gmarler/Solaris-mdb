@@ -27,6 +27,7 @@ use Expect        qw(exp_continue);
 has [ 'expect' ]   =>   ( is => 'ro', isa => 'Expect',
                           builder => '_build_expect', lazy_build => 1, );
 has [ 'mdb_bin' ]  =>   ( is => 'ro', isa => 'Str', default => '/usr/bin/mdb' );
+has [ 'timeout' ]  =>   ( is => 'ro', isa => 'Int', default => 5 );
 
 sub _build_expect {
   my $self = shift;
@@ -47,7 +48,7 @@ sub _build_expect {
 
   # See if process immediately exited with error message due to no having
   # proper privileges:
-  $exp->expect(5,
+  $exp->expect($self->timeout,
     [ qr{mdb:\sfailed\sto\sopen\s/dev/kmem:\sPermission\sdenied},
                         sub {
                           my $self = shift;
@@ -96,7 +97,7 @@ sub quit {
   $log->debug("Quitting mdb");
 
   # The clean way
-  $exp_obj->expect(5,
+  $exp_obj->expect($self->timeout,
     [ qr/\r?\>\s/,  sub { my $self = shift;
                           $str = $self->match();
                           $log->debug("BEFORE: [" . $self->before() . "]");
@@ -138,13 +139,9 @@ sub capture_dcmd {
   my $exp_obj = $self->expect;
   my ($str,$retval,$output);
 
-  if ($dcmd !~ /^::/) {
-    $log->error("[$dcmd] isn't a valid mdb dcmd!");
-    return;    # undef
-  }
   $log->debug("Running dcmd [$dcmd]");
 
-  $exp_obj->expect(5,
+  $exp_obj->expect($self->timeout,
     #
     # Valid dcmd will return possibly multiline output, followed by a prompt
     #
@@ -156,7 +153,7 @@ sub capture_dcmd {
                           $str  = $self->before() . $self->match();
                           # Strip the dcmd + newline off the beginning of the
                           # output
-                          ($output = $str) =~ s/^${dcmd}\n//smx;
+                          ($output = $str) =~ s/^\Q${dcmd}\E\n//smx;
                           $log->debug("USEFUL OUTPUT: [$output]");
                           if ($output) { $retval = $output; }
                           else         { $retval =   undef; }
@@ -201,7 +198,7 @@ sub kvar_exists {
 
   $log->debug("Checking whether kernel variable [$kvar] exists in this kernel");
 
-  $exp_obj->expect(5,
+  $exp_obj->expect($self->timeout,
     # invalid kernel variable
     [ qr/mdb:\sfailed\sto\sdereference\ssymbol:\sunknown\ssymbol\sname/,
                     sub { my $self = shift;
@@ -248,7 +245,7 @@ sub kvar_size {
 
   $log->debug("Checking size (in bytes) of kernel variable [$kvar]");
 
-  $exp_obj->expect(5,
+  $exp_obj->expect($self->timeout,
     # invalid kernel variable
     [ qr/mdb:\sfailed\sto\sdereference\ssymbol:\sunknown\ssymbol\sname/,
                     sub { my $self = shift;
