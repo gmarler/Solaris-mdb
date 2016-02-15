@@ -314,6 +314,11 @@ sub kvar_size {
 #   ],
 # );
 
+=method variable_exists
+
+This method probably has been replaced by kvar_exists - check later
+
+=cut
 
 sub variable_exists {
   my ($self) = shift;
@@ -341,7 +346,7 @@ sub variable_exists {
   );
   # Test for the variable's existence
   #
-  # EXISTS: 
+  # EXISTS:
   # > ncsize::nm -h -f sz
   # 0x0000000000000004
   #
