@@ -1,0 +1,63 @@
+
+use v5.18;
+
+use Expect::Simple;
+
+my $exp = Expect::Simple->new(
+  { Cmd           => [ "mdb", "-k" ],
+    Prompt        => [
+                       -re => '\n>>\sMore\s.+$',
+                       -re => '\n>\s(?!\s+)',
+                     ],
+    DisconnectCmd => '$q',
+    Timeout       => 3,
+    RawPty        => 1,
+    # Debug         => 1,
+    #Verbose       => 1,
+  } );
+
+# $exp->send( "::status\n" );
+$exp->send( "::dcmds\n" );
+
+say "Match index: " . $exp->match_idx;
+
+while ($exp->match_idx == 1) {
+  $exp->send( "c\n" );
+  say "BEFORE-------------------------------------";
+  say $exp->before;
+  say "AFTER--------------------------------------";
+  say $exp->after;
+}
+
+say "Match index: " . $exp->match_idx;
+
+say "BEFORE-------------------------------------";
+say $exp->before;
+say "AFTER--------------------------------------";
+say $exp->after;
+
+
+# $exp->send( "::dcmds\n" );
+# 
+# say "BEFORE-------------------------------------";
+# say $exp->before;
+# say "AFTER--------------------------------------";
+# say $exp->after;
+# 
+# say "Match index: " . $exp->match_idx;
+# while ($exp->match_idx == 1) {
+#   $exp->send( " \n" );
+#   say "BEFORE-------------------------------------";
+#   say $exp->before;
+#   say "AFTER--------------------------------------";
+#   say $exp->after;
+# }
+
+# $exp->send( "::walkers" );
+# 
+# say "BEFORE-------------------------------------";
+# say $exp->before;
+# say "AFTER--------------------------------------";
+# say $exp->after;
+
+exit(0);

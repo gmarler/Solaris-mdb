@@ -1,5 +1,6 @@
 package Solaris::mdb;
 
+use v5.20;
 use strict;
 use warnings;
 
@@ -276,6 +277,70 @@ sub kvar_size {
   );
 
   return $retval;
+}
+
+
+=method variable_exists
+
+This method probably has been replaced by kvar_exists - check later
+
+=cut
+
+sub variable_exists {
+  my ($self) = shift;
+  my ($varname) = shift;
+
+  # Throw an exception is $varname is not defined
+  unless (defined($varname)) {
+    die "variable_exists requires a variable";
+  }
+
+  # Expect the mdb prompt
+  my $e = $self->mdb();
+  $e->expect( 2,
+              [ qr/^>\s(?!\s+)/m,
+                sub { my $sub_e = shift;
+                      $sub_e->send("${varname}::nm -h -f sz\n");
+                    }
+              ],
+              [ eof =>
+                sub { my $sub_e = shift;
+                      # TODO: Throw an exception
+                      die "mdb terminated unexpectedly";
+                    }
+              ],
+  );
+  # Test for the variable's existence
+  #
+  # EXISTS:
+  # > ncsize::nm -h -f sz
+  # 0x0000000000000004
+  #
+  #
+  # DOES NOT EXIST:
+  # > junk::nm -h -f sz
+  # mdb: failed to dereference symbol: unknown symbol name
+  my ($exists);
+  $e->expect( 2,
+              [ qr/^0x0+\d+\n/m,
+                sub { my $sub_e = shift;
+                      $exists = 1;
+                    }
+              ],
+              [ qr/unknown\s+symbol\s+name/m,
+                sub { my $sub_e = shift;
+                      $exists = 0;
+                    }
+              ],
+              [ eof =>
+                sub { my $sub_e = shift;
+                      # TODO: Throw an exception
+                      die "mdb terminated unexpectedly";
+                    }
+              ],
+  );
+
+  return $exists;
 }
 
 no Moose;

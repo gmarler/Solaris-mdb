@@ -1,0 +1,87 @@
+{
+   "abstract" : "Provides a Perl interface to the Solaris mdb utility in kernel mode",
+   "author" : [
+      "Gordon Marler <gmarler@gmarler.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Solaris-mdb",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Expect" : "0",
+            "Log::Log4perl" : "0",
+            "Moose" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "MooseX::Log::Log4perl" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "v5.18.1",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::Class::Moose" : "0",
+            "Test::Class::Moose::Load" : "0",
+            "Test::Class::Moose::Role::AutoUse" : "0",
+            "Test::Class::Moose::Runner" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Solaris::mdb" : {
+         "file" : "lib/Solaris/mdb.pm",
+         "version" : "0.001"
+      },
+      "Solaris::mdb::Variable" : {
+         "file" : "lib/Solaris/mdb/Variable.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.001"
+}
+
