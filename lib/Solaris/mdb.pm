@@ -94,8 +94,6 @@ sub BUILD {
   my $logger = $self->logger;
 
   $logger->debug( "Building " . __PACKAGE__ );
-
-  $self->timer;
 }
 
 
