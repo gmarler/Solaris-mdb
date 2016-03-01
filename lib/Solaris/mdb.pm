@@ -17,13 +17,14 @@ Solaris::mdb - A Perl Interface to the Solaris mdb command
 
 use Moose;
 use Moose::Util::TypeConstraints;
-with 'MooseX::Log::Log4perl';
 use namespace::autoclean;
-use Log::Log4perl qw(:easy);
-use Expect        qw(exp_continue);
+use Expect                         qw(exp_continue);
 #use Try::Tiny;
 #use Throwable::Factory
-#  GeneralException => undef;
+#  GeneralException => undef
+
+with 'MooseX::Log::Log4perl';
+
 
 has [ 'expect' ]   =>   ( is => 'ro', isa => 'Expect',
                           builder => '_build_expect', lazy_build => 1, );
