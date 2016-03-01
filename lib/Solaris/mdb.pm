@@ -25,11 +25,25 @@ use Expect                         qw(exp_continue);
 
 with 'MooseX::Log::Log4perl';
 
+has [ 'logger' ] => (
+  is       => 'ro',
+  isa      => 'Log::Log4perl::Logger',
+  builder  => '_build_logger',
+);
 
 has [ 'expect' ]   =>   ( is => 'ro', isa => 'Expect',
                           builder => '_build_expect', lazy_build => 1, );
 has [ 'mdb_bin' ]  =>   ( is => 'ro', isa => 'Str', default => '/usr/bin/mdb' );
 has [ 'timeout' ]  =>   ( is => 'ro', isa => 'Int', default => 5 );
+
+
+sub _build_logger {
+  my ($self) = @_;
+
+  # Ensure we're in the right logging category, so the right data goes to any
+  # particular destination we want it to
+  return $self->log(__PACKAGE__);
+}
 
 sub _build_expect {
   my $self = shift;
@@ -67,6 +81,23 @@ sub _build_expect {
 
   return $exp;
 }
+
+=method BUILD
+
+Build our object in the proper sequence
+
+=cut
+
+sub BUILD {
+  my ($self) = @_;
+
+  my $logger = $self->logger;
+
+  $logger->debug( "Building " . __PACKAGE__ );
+
+  $self->timer;
+}
+
 
 =method DEMOLISH
 
